@@ -6,6 +6,7 @@ class Course(models.Model):
     name = models.CharField(max_length=200, verbose_name='Название')
     preview = models.ImageField(upload_to='lms/courses/', blank=True, null=True, verbose_name='Превью')
     description = models.TextField(blank=True, null=True, verbose_name='Описание')
+    price = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name='Цена, руб.')
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, blank=True, null=True,
         related_name='courses', verbose_name='Владелец',

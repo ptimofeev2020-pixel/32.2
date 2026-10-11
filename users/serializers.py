@@ -6,7 +6,17 @@ from users.models import User, Payment
 class PaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Payment
-        fields = ['id', 'user', 'payment_date', 'paid_course', 'paid_lesson', 'amount', 'payment_method']
+        fields = [
+            'id', 'user', 'payment_date', 'paid_course', 'paid_lesson', 'amount', 'payment_method',
+            'stripe_product_id', 'stripe_price_id', 'session_id', 'link', 'status',
+        ]
+        read_only_fields = [
+            'user', 'amount', 'payment_date', 'stripe_product_id', 'stripe_price_id', 'session_id', 'link', 'status',
+        ]
+
+
+class PaymentCreateSerializer(serializers.Serializer):
+    course_id = serializers.IntegerField(help_text='ID оплачиваемого курса')
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
