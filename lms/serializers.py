@@ -22,14 +22,14 @@ class CourseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Course
-        fields = ['id', 'name', 'preview', 'description', 'owner', 'lesson_count', 'lessons', 'is_subscribed']
+        fields = ['id', 'name', 'preview', 'description', 'price', 'owner', 'lesson_count', 'lessons', 'is_subscribed']
         read_only_fields = ['owner']
         validators = [YoutubeLinkValidator(field='description')]
 
-    def get_lesson_count(self, obj):
+    def get_lesson_count(self, obj) -> int:
         return obj.lessons.count()
 
-    def get_is_subscribed(self, obj):
+    def get_is_subscribed(self, obj) -> bool:
         request = self.context.get('request')
         if request is None or not request.user.is_authenticated:
             return False

@@ -1,6 +1,11 @@
+import os
 from pathlib import Path
 
+from dotenv import load_dotenv
+
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+load_dotenv(BASE_DIR / '.env')
 
 SECRET_KEY = 'django-insecure-lms-drf-secret-key-change-me-000111222333'
 
@@ -18,6 +23,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters',
     'rest_framework_simplejwt',
+    'drf_spectacular',
     'users',
     'lms',
 ]
@@ -83,6 +89,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend',
         'rest_framework.filters.OrderingFilter',
@@ -95,5 +102,16 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'LMS API',
+    'DESCRIPTION': 'API платформы онлайн-обучения: курсы, уроки, подписки, пользователи и оплата',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+}
+
+STRIPE_API_KEY = os.getenv('STRIPE_API_KEY', '')
+PAYMENT_SUCCESS_URL = os.getenv('PAYMENT_SUCCESS_URL', 'http://127.0.0.1:8000/payments/success/')
+PAYMENT_CANCEL_URL = os.getenv('PAYMENT_CANCEL_URL', 'http://127.0.0.1:8000/payments/cancel/')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

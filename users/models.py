@@ -48,6 +48,11 @@ class Payment(models.Model):
     payment_method = models.CharField(
         max_length=20, choices=METHOD_CHOICES, default=METHOD_TRANSFER, verbose_name='Способ оплаты'
     )
+    stripe_product_id = models.CharField(max_length=255, blank=True, null=True, verbose_name='ID продукта Stripe')
+    stripe_price_id = models.CharField(max_length=255, blank=True, null=True, verbose_name='ID цены Stripe')
+    session_id = models.CharField(max_length=255, blank=True, null=True, verbose_name='ID сессии Stripe')
+    link = models.URLField(max_length=1000, blank=True, null=True, verbose_name='Ссылка на оплату')
+    status = models.CharField(max_length=50, blank=True, null=True, verbose_name='Статус оплаты')
 
     class Meta:
         verbose_name = 'Платёж'

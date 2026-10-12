@@ -1,4 +1,6 @@
 from django.shortcuts import get_object_or_404
+from drf_spectacular.utils import extend_schema, OpenApiResponse, inline_serializer
+from rest_framework import serializers
 from rest_framework import viewsets, generics, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -19,6 +21,8 @@ class CourseViewSet(viewsets.ModelViewSet):
     pagination_class = LmsPagination
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return Course.objects.none()
         if is_moderator(self.request.user):
             return Course.objects.all()
         return Course.objects.filter(owner=self.request.user)
@@ -40,6 +44,8 @@ class CourseViewSet(viewsets.ModelViewSet):
 
 class LessonQuerysetMixin:
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return Lesson.objects.none()
         if is_moderator(self.request.user):
             return Lesson.objects.all()
         return Lesson.objects.filter(owner=self.request.user)
@@ -77,6 +83,16 @@ class LessonDestroyAPIView(LessonQuerysetMixin, generics.DestroyAPIView):
 class SubscriptionAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        summary='Подписка на обновления курса',
+        description='Если подписки нет — создаёт её, если есть — удаляет.',
+        request=inline_serializer('SubscriptionRequest', fields={'course_id': serializers.IntegerField()}),
+        responses={
+            200: inline_serializer('SubscriptionResponse', fields={'message': serializers.CharField()}),
+            404: OpenApiResponse(description='Курс не найден'),
+        },
+        tags=['subscriptions'],
+    )
     def post(self, request, *args, **kwargs):
         course_id = request.data.get('course_id')
         course = get_object_or_404(Course, pk=course_id)
